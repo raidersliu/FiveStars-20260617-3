@@ -1,0 +1,75 @@
+import streamlit as st
+from PIL import Image, ImageDraw, ImageFont
+import math
+import io
+from datetime import datetime
+
+# ==========================================
+# 核心計算邏輯
+# ==========================================
+def split_and_sum(date_str):
+    """計算生日數字總和，若為2開頭則加18"""
+    digits = [int(ch) for ch in date_str if ch.isdigit()]
+    total = sum(digits)
+    if date_str[0] == '2':
+        total += 18
+    return digits, total
+
+def reduce_to_single_digit(n):
+    """將數字簡化至 1-10 之間"""
+    while n > 10:
+        n = sum(int(d) for d in str(n))
+    return n
+
+def get_next_type(current):
+    """
+    關鍵規則：當類型為 10 時，下一個轉換是 2 (跳過 1)
+    循環順序為：2, 3, 4, 5, 6, 7, 8, 9, 10
+    """
+    if current == 10:
+        return 2
+    return current + 1
+
+def get_type_chain(start_type, steps):
+    """計算星型類型變化序列"""
+    chain = []
+    curr = start_type
+    for _ in range(steps):
+        curr = get_next_type(curr)
+        chain.append(curr)
+    return chain
+
+def count_10_components(date_str):
+    """計算生日中年份、月份、日期為 10 的倍數之次數"""
+    year = int(date_str[2:4])
+    month = int(date_str[4:6])
+    day = int(date_str[6:8])
+    return sum(1 for val in [year, month, day] if val % 10 == 0)
+
+def sum_mmdd_digits(date_str):
+    """計算人格數字 (MMDD)"""
+    mmdd = date_str[4:8]
+    digits = [int(d) for d in mmdd]
+    summ = sum(digits)
+    while summ > 10:
+        summ = sum(int(d) for d in str(summ))
+    return summ
+
+def analyze_date_code(date_str):
+    """統計生日碼中各個數字出現次數 (1-10)"""
+    yy = date_str[2:4]
+    mm = date_str[4:6]
+    dd = date_str[6:8]
+    combined_digits = yy + mm + dd
+    digit_count = {str(i): 0 for i in range(1, 11)}
+    for ch in combined_digits:
+        if ch in digit_count:
+            digit_count[ch] += 1
+    # 統計 10 的數量
+    digit_count["10"] = sum(1 for x in [yy, mm, dd] if int(x) % 10 == 0)
+    return digit_count
+
+def modify_code(date_str, digit_count):
+    """修正 1 的計數（若有 10 出現，需扣除誤算的 1）"""
+    yy = int(date_str[2:4])
+    mm = int(date_str
