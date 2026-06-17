@@ -110,7 +110,7 @@ def draw_star_with_repeated_numbers(result, typen, digit_count, ten_count):
     draw = ImageDraw.Draw(img)
 
     # 🎨 修改點 1：改成讀取你準備好的可愛字體檔案 (請確保檔名一致)
-    font_file = "CuteFont.ttf"
+    font_file = "NotoSansTC-Regular.ttf"
     try:
         # 為了可愛字體更清晰，將字體大小稍微調大一點點
         font = ImageFont.truetype(font_file, 20)
