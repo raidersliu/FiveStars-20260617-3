@@ -85,7 +85,7 @@ def calculate_star_type(birthday_str):
         "轉換次數": ten_count,
         "類型 Type": simplified,
         "人格 Personality": personality,
-        "星型類型變化": get_type_chain(simplified, ten_count)
+        "星型類型變化": get_type_chain(simplified, ten_count),
         "成熟年齡": total_sum,
         "轉變年齡": [total_sum + 10 * i for i in range(1, ten_count + 1)]
     }
