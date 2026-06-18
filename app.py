@@ -93,13 +93,13 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
     stars_html = ""
     current_t = start_t
     
-    # 【關鍵修正】：將畫布加大，並設定文字的絕對距離
+    # 畫布大小
     svg_size = 560
     center_x, center_y = svg_size / 2, (svg_size / 2) + 5 # 微微向下偏移對齊視覺中心
     
-    # 這裡直接設定字體離中心的半徑，將數字強制推到外圍！
-    text_radius_outer = 245  # 外五角文字距離 (遠離星星角)
-    text_radius_inner = 130  # 內凹角文字距離 (遠離星星邊)
+    # 【關鍵修正】：將數字強制推到外圍，保證不遮擋角與邊
+    text_radius_outer = 230  # 外五角文字距離 (保證在最尖角的外面)
+    text_radius_inner = 120  # 內凹角文字距離 (保證在內角的外面)
 
     for trans in range(ten_count + 1):
         if trans > 0:
@@ -151,7 +151,7 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
                         </filter>
                     </defs>
                     {texts_html}
-                    <circle cx="{center_x}" cy="{center_y}" r="26" fill="#1A1C29" stroke="#E2E8F0" stroke-width="2"/>
+                    <circle cx="{center_x}" cy="{center_y}" r="20" fill="#000000" stroke="#E2E8F0" stroke-width="1.5"/>
                     <text x="{center_x}" y="{center_y}" class="center-text" dy="0.35em">T {current_t}</text>
                 </svg>
             </div>
@@ -167,24 +167,26 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
         <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
         <style>
             body {{
-                background-color: transparent; margin: 0; padding: 20px 0;
+                background-color: #000000; /* 背景全黑 */
+                margin: 0; padding: 20px 0;
                 display: flex; justify-content: flex-start; overflow-x: auto;
             }}
             .flex-wrapper {{ display: flex; gap: 30px; padding: 10px 20px; }}
             .star-container {{
                 display: flex; flex-direction: column; align-items: center;
-                background: linear-gradient(145deg, #181a2e, #131424);
+                background-color: #000000; /* 卡片背景全黑 */
                 border-radius: 20px; padding: 20px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #2a2d4a;
+                border: none; /* 移除邊框 */
+                box-shadow: none; /* 移除陰影 */
             }}
             .visual-wrapper {{
                 position: relative; width: {svg_size}px; height: {svg_size}px;
             }}
             .bg-star {{
                 position: absolute; 
-                /* 【關鍵修正】：將星星圖片向內縮小，騰出四周寬闊的安全邊界 */
-                top: 16%; left: 16%;
-                width: 68%; height: 68%; 
+                /* 【關鍵修正】：進一步將星星圖片往內縮小，確保外圍有巨大安全邊界 */
+                top: 20%; left: 20%;
+                width: 60%; height: 60%; 
                 object-fit: contain;
                 filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.8));
             }}
@@ -193,11 +195,14 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
             text {{ font-family: 'Fredoka', 'Noto Sans TC', sans-serif; text-anchor: middle; dominant-baseline: middle; }}
             .dynamic-num {{ fill: #FF6B6B; font-size: 16px; font-weight: 600; letter-spacing: 1px; filter: url(#glow); }}
             .static-num {{ fill: #F9E596; font-size: 18px; font-weight: 500; letter-spacing: 1px; }}
-            .center-text {{ fill: #E2E8F0; font-size: 16px; font-weight: 600; letter-spacing: 1px; }}
+            
+            /* 【關鍵修正】：中心T字體縮小至 13px */
+            .center-text {{ fill: #E2E8F0; font-size: 13px; font-weight: 600; letter-spacing: 1px; }}
+            
             .stage-label {{ color: #A0AEC0; font-family: 'Fredoka', sans-serif; font-size: 18px; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase; }}
             
             ::-webkit-scrollbar {{ height: 10px; }}
-            ::-webkit-scrollbar-track {{ background: #131424; border-radius: 5px; }}
+            ::-webkit-scrollbar-track {{ background: #000000; border-radius: 5px; }}
             ::-webkit-scrollbar-thumb {{ background: #4A5568; border-radius: 5px; }}
         </style>
     </head>
@@ -211,9 +216,10 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
 # ==========================================
 st.set_page_config(page_title="身體自覺五星術", layout="wide", page_icon="🌟")
 
+# 【關鍵修正】：Streamlit 應用程式主背景全黑
 st.markdown("""
 <style>
-    .stApp { background-color: #0F101C; color: #E2E8F0; }
+    .stApp { background-color: #000000; color: #E2E8F0; }
     h1 { color: #F9E596; font-family: '微軟正黑體', sans-serif; }
     .stTextInput>div>div>input { background-color: #1A1C29; color: #F9E596; border: 1px solid #4A5568; }
 </style>
