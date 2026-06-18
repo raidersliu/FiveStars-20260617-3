@@ -291,7 +291,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🌟 身體自覺五星術分析系統 (Web 3D 向量版)")
+st.title("🌟 身體自覺 五星術分析系統 🌟")
 
 col1, col2 = st.columns([1, 3])
 
@@ -314,7 +314,7 @@ if run_btn:
                     st.info(f"**{key}**: {val}")
             
             with col2:
-                st.markdown("### 🎨 能量變化軌跡 (可向右滑動查看所有階段)")
+                st.markdown(" ")
                 # 產生網頁 HTML
                 html_content = generate_stars_html(start_t, counts, num_trans)
                 
