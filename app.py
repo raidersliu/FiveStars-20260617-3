@@ -81,43 +81,48 @@ def calculate_star_type(birthday_str):
 # 2. 影像處理與網頁視覺化生成器
 # ==========================================
 def get_image_as_base64(file_path):
-    """將本地圖片轉為 base64，以便嵌入 HTML 中"""
     if os.path.exists(file_path):
         with open(file_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
     return None
 
 def generate_stars_html(start_t, digit_count, ten_count, b64_image):
-    """結合自訂圖片與 SVG 文字生成 HTML"""
     numbers_with_counts = [(str(i), int(digit_count[str(i)])) for i in range(1, 11)]
     stars_html = ""
     current_t = start_t
     
     # 畫布大小
     svg_size = 560
-    center_x, center_y = svg_size / 2, (svg_size / 2) + 5 # 微微向下偏移對齊視覺中心
+    # 將座標中心微微向下偏移，讓星星在視覺上更置中
+    center_x, center_y = svg_size / 2, (svg_size / 2) + 5 
     
-    # 【關鍵修正】：將數字強制推到外圍，保證不遮擋角與邊
-    text_radius_outer = 230  # 外五角文字距離 (保證在最尖角的外面)
-    text_radius_inner = 120  # 內凹角文字距離 (保證在內角的外面)
+    # 【關鍵修改 1：精準抓取您銀色星星的實際頂點半徑】
+    # 這些數值是配合圖片縮放比例(60%)所推算出來的，用來計算角度
+    radius_outer = 150  # 模擬外角尖端位置
+    radius_inner = 70   # 模擬內凹角位置
+    
+    # 【關鍵修改 2：設定適當的貼齊距離】
+    # 這是文字距離星星邊緣向外延伸的「專屬空間」，不會太遠也不會壓到角
+    offset_outer = 40  # 外角文字向外推的距離
+    offset_inner = 35  # 內角文字向外推的距離
 
     for trans in range(ten_count + 1):
         if trans > 0:
             current_t = get_next_type(current_t)
             
         points = []
+        # 計算 10 個頂點的基準座標
         for i in range(5):
             outer_angle = math.radians(90 + i * 72)
             inner_angle = math.radians(90 + i * 72 + 36)
             
-            # 直接使用新的半徑推算 X, Y 座標
-            points.append((center_x + text_radius_outer * math.cos(outer_angle),
-                           center_y - text_radius_outer * math.sin(outer_angle)))
-            points.append((center_x + text_radius_inner * math.cos(inner_angle),
-                           center_y - text_radius_inner * math.sin(inner_angle)))
+            points.append((center_x + radius_outer * math.cos(outer_angle),
+                           center_y - radius_outer * math.sin(outer_angle), "outer"))
+            points.append((center_x + radius_inner * math.cos(inner_angle),
+                           center_y - radius_inner * math.sin(inner_angle), "inner"))
 
         texts_html = ""
-        for idx, (px, py) in enumerate(points):
+        for idx, (px, py, point_type) in enumerate(points):
             number, count = numbers_with_counts[idx]
             static_text = ",".join([number] * count) if count > 0 else ""
             
@@ -125,11 +130,21 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
             number1, count1 = numbers_with_counts[shift_idx]
             dy_text = f"({','.join([number1] * count1)})" if count1 > 0 else ""
 
-            # 稍微將兩層文字錯開，避免重疊
+            # 計算該頂點與中心的角度
+            angle = math.atan2(py - center_y, px - center_x)
+            
+            # 【關鍵修改 3：根據是內角還是外角，給予不同的延伸距離】
+            current_offset = offset_outer if point_type == "outer" else offset_inner
+            
+            # 算出文字的最終圓心座標
+            base_x = px + current_offset * math.cos(angle)
+            base_y = py + current_offset * math.sin(angle)
+
+            # 將兩層文字錯開，避免重疊
             if dy_text:
-                texts_html += f'<text x="{px}" y="{py - 12}" class="dynamic-num">{dy_text}</text>\n'
+                texts_html += f'<text x="{base_x}" y="{base_y - 10}" class="dynamic-num">{dy_text}</text>\n'
             if static_text:
-                texts_html += f'<text x="{px}" y="{py + 12}" class="static-num">{static_text}</text>\n'
+                texts_html += f'<text x="{base_x}" y="{base_y + 10}" class="static-num">{static_text}</text>\n'
 
         if b64_image:
             image_html = f'<img src="data:image/png;base64,{b64_image}" class="bg-star" />'
@@ -167,26 +182,24 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
         <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Noto+Sans+TC:wght@500;700&display=swap" rel="stylesheet">
         <style>
             body {{
-                background-color: #000000; /* 背景全黑 */
+                background-color: #000000; 
                 margin: 0; padding: 20px 0;
                 display: flex; justify-content: flex-start; overflow-x: auto;
             }}
             .flex-wrapper {{ display: flex; gap: 30px; padding: 10px 20px; }}
             .star-container {{
                 display: flex; flex-direction: column; align-items: center;
-                background-color: #000000; /* 卡片背景全黑 */
+                background-color: #000000; 
                 border-radius: 20px; padding: 20px;
-                border: none; /* 移除邊框 */
-                box-shadow: none; /* 移除陰影 */
+                border: none; box-shadow: none; 
             }}
             .visual-wrapper {{
                 position: relative; width: {svg_size}px; height: {svg_size}px;
             }}
             .bg-star {{
                 position: absolute; 
-                /* 【關鍵修正】：進一步將星星圖片往內縮小，確保外圍有巨大安全邊界 */
-                top: 20%; left: 20%;
-                width: 60%; height: 60%; 
+                top: 18%; left: 18%;
+                width: 64%; height: 64%; 
                 object-fit: contain;
                 filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.8));
             }}
@@ -196,9 +209,7 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
             .dynamic-num {{ fill: #FF6B6B; font-size: 16px; font-weight: 600; letter-spacing: 1px; filter: url(#glow); }}
             .static-num {{ fill: #F9E596; font-size: 18px; font-weight: 500; letter-spacing: 1px; }}
             
-            /* 【關鍵修正】：中心T字體縮小至 13px */
             .center-text {{ fill: #E2E8F0; font-size: 13px; font-weight: 600; letter-spacing: 1px; }}
-            
             .stage-label {{ color: #A0AEC0; font-family: 'Fredoka', sans-serif; font-size: 18px; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase; }}
             
             ::-webkit-scrollbar {{ height: 10px; }}
@@ -216,7 +227,6 @@ def generate_stars_html(start_t, digit_count, ten_count, b64_image):
 # ==========================================
 st.set_page_config(page_title="身體自覺五星術", layout="wide", page_icon="🌟")
 
-# 【關鍵修正】：Streamlit 應用程式主背景全黑
 st.markdown("""
 <style>
     .stApp { background-color: #000000; color: #E2E8F0; }
@@ -235,7 +245,7 @@ with col1:
     
     img_path = "STAR.jpg"
     if os.path.exists(img_path):
-         st.success(f" ")
+         st.success(" ")
     else:
          st.warning(f"⚠️ 找不到 `{img_path}`。請確保圖片與程式碼放在同一資料夾。")
 
@@ -257,7 +267,6 @@ if run_btn:
                 st.markdown(" ")
                 b64_img = get_image_as_base64(img_path)
                 html_content = generate_stars_html(start_t, counts, num_trans, b64_img)
-                # 高度稍微加大到 750 以容納變大的 SVG 畫布
                 components.html(html_content, height=750, scrolling=True)
                 
         except ValueError:
