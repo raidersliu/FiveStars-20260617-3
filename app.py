@@ -71,7 +71,9 @@ def calculate_star_type(birthday_str):
         "類型 Type": simplified,
         "人格 Personality": personality,
         "成熟年齡": total_sum,
-        "轉換次數": ten_count
+        "轉換次數": ten_count,
+        "星型類型變化": get_type_chain(simplified, ten_count),
+        "轉變年齡": [total_sum + 10 * i for i in range(1, ten_count + 1)]
     }
 
 # 將 HTML 模板修改為適合 PDF 渲染的樣式，並包含 Google Fonts 連結
