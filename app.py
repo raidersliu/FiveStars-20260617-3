@@ -85,9 +85,7 @@ def calculate_star_type(birthday_str):
         "轉換次數": ten_count,
         "類型 Type": simplified,
         "人格 Personality": personality,
-        "星型類型變化": get_type_chain(simplified, ten_count),
-        "成熟年齡": total_sum,
-        "轉變年齡": [total_sum + 10 * i for i in range(1, ten_count + 1)]
+        "星型類型變化": get_type_chain(simplified, ten_count)
     }
     return result, simplified, ten_count
 
@@ -293,7 +291,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🌟 身體自覺 五星術分析系統 🌟")
+st.title("🌟 身體自覺五星術分析系統 (Web 3D 向量版)")
 
 col1, col2 = st.columns([1, 3])
 
@@ -316,7 +314,7 @@ if run_btn:
                     st.info(f"**{key}**: {val}")
             
             with col2:
-                st.markdown(" ")
+                st.markdown("### 🎨 能量變化軌跡 (可向右滑動查看所有階段)")
                 # 產生網頁 HTML
                 html_content = generate_stars_html(start_t, counts, num_trans)
                 
