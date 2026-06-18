@@ -234,7 +234,7 @@ with col1:
     run_btn = st.button("開始分析與生成", type="primary", use_container_width=True)
     
     # 提醒使用者圖片狀態
-    img_path = "star.png"
+    img_path = "STAR.jpg"
     if os.path.exists(img_path):
          st.success(f"✅ 已成功載入 `{img_path}`")
     else:
@@ -255,7 +255,7 @@ if run_btn:
                     st.info(f"**{key}**: {val}")
             
             with col2:
-                st.markdown("### 🎨 能量變化軌跡 (可向右滑動)")
+                st.markdown(" ")
                 
                 # 讀取本地圖片轉換為 Base64
                 b64_img = get_image_as_base64(img_path)
