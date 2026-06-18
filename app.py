@@ -219,7 +219,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🌟 身體自覺五星術分析系統 (自訂銀星版)")
+st.title("🌟 身體自覺五星術分析系統")
 
 col1, col2 = st.columns([1, 3])
 
@@ -227,9 +227,9 @@ with col1:
     birthday = st.text_input("輸入生日 (YYYYMMDD)", value="19901020", max_chars=8)
     run_btn = st.button("開始分析與生成", type="primary", use_container_width=True)
     
-    img_path = "star.png"
+    img_path = "STAR.jpg"
     if os.path.exists(img_path):
-         st.success(f"✅ 已成功載入 `{img_path}`")
+         st.success(f" ")
     else:
          st.warning(f"⚠️ 找不到 `{img_path}`。請確保圖片與程式碼放在同一資料夾。")
 
@@ -248,7 +248,7 @@ if run_btn:
                     st.info(f"**{key}**: {val}")
             
             with col2:
-                st.markdown("### 🎨 能量變化軌跡 (可向右滑動)")
+                st.markdown(" ")
                 b64_img = get_image_as_base64(img_path)
                 html_content = generate_stars_html(start_t, counts, num_trans, b64_img)
                 # 高度稍微加大到 750 以容納變大的 SVG 畫布
